@@ -1,0 +1,26 @@
+# OS files
+.DS_Store
+Thumbs.db
+
+# Editor files
+*.swp
+*.swo
+*~
+.vscode/
+.idea/
+
+# Personal context files (only the primer is public)
+01_identity.md
+02_expertise.md
+03_work_style.md
+04_active_roles.md
+05_projects.md
+06_writing_voice.md
+07_interests_learning.md
+08_personal.md
+09_tools_stack.md
+10_mental_models.md
+00_loader.md
+NOW.md
+Reference_ERS_Brain_Context/
+REF_*.md

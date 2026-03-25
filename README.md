@@ -33,7 +33,15 @@ Plain Markdown files beat complex memory infrastructure for personal AI context 
 
 ## Deploying Your Brain
 
-Once built, your AI Brain works anywhere:
+### Recommended: MCP Server (automated, always in sync)
+
+Use **[brain-mcp-server](https://github.com/JEM-Fizbit/brain-mcp-server)** — a generic MCP server that serves your Brain files to any MCP-compatible Claude client. Claude can read, write, search, and git-commit Brain files directly via tool calls. No manual uploading, no stale copies.
+
+Works with Claude Code, Claude Desktop, and Claude Cowork. See the [brain-mcp-server README](https://github.com/JEM-Fizbit/brain-mcp-server#readme) for setup instructions.
+
+### Manual alternatives
+
+If MCP isn't available, your Brain still works anywhere:
 
 | Tool | How to Use |
 |------|-----------|

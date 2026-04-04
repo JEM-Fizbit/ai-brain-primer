@@ -14,6 +14,7 @@ This repo contains a comprehensive primer covering the methodology, architecture
 - **Interview Framework** — Four rounds of structured questions to capture context that documents alone can't provide. Designed to push past generic self-descriptions into specific, actionable instructions.
 - **Design Principles** — One topic per file, under 200 lines each, actionable over descriptive, progressive disclosure, source from documents not memory.
 - **Recommended File Structure** — A complete architecture with loader, identity, expertise map, work style, writing voice, projects, tools, mental models, and a dynamic `NOW.md` for current priorities.
+- **Operational Patterns** — Four processes that keep a Brain healthy as it grows: Ingest (how new information enters), Log (tracking what changed and when), Lint (periodic health checks for staleness, contradictions, bloat), and Index (navigating at scale).
 - **Maintenance Cadence** — When to update each file type, how to consolidate insights over time, and how to prune aggressively.
 - **Getting Started** — A copy-paste prompt you can feed to Claude (or any AI assistant) to build your Brain in a single session, plus an adaptation prompt for migrating existing context systems.
 

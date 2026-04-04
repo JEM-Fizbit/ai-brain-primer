@@ -117,6 +117,16 @@ A good loader includes:
 - A complete file listing.
 - Maintenance metadata (created date, last reviewed, review cadence).
 
+### Journal — The Daily Capture File
+**Cadence:** Daily entries, pruned weekly.
+
+A flat file (`JOURNAL.md`) for capturing decisions, actions, and reflections as they happen. Think of it as a staging area — entries live here temporarily until they're either ingested into the relevant Brain file during a weekly review, or pruned as ephemeral. Not an archive; not a diary. If the file exceeds 200 lines, that's a signal you're not pruning aggressively enough (or it's time to switch to weekly files in a `journal/` folder).
+
+### Task Queue — Operational To-Dos
+**Cadence:** Updated as tasks arise; reviewed weekly alongside NOW.md.
+
+`TASKS.md` tracks specific, actionable to-dos — distinct from the strategic priorities in `NOW.md`. NOW.md answers "what am I focused on?"; TASKS.md answers "what specifically needs doing?". Simple checkbox format. Future integration point for external task systems (Asana, Linear, etc.) via MCP or other automation.
+
 ### Context-Specific Packs
 For domains that need deep, specialised context (e.g., a specific company you work for, a complex project, a brand voice), maintain separate sub-directories. These get loaded only when relevant and prevent the core Brain from bloating.
 
@@ -224,6 +234,9 @@ AI Brain/
 ├── 09_tools_stack.md         # Tech stack, tools, workflows
 ├── 10_mental_models.md       # Decision frameworks, worldview, beliefs
 ├── NOW.md                    # Current focus, priorities, open decisions
+├── JOURNAL.md                # Daily capture — decisions, actions, reflections
+├── TASKS.md                  # Live task queue — operational to-dos
+├── LOG.md                    # Append-only change log (ingests, updates, lints)
 └── [domain_context]/         # Separate packs for specific domains
     ├── company_brain/
     └── project_brain/
@@ -261,6 +274,74 @@ Update the relevant files and prune what's no longer true.
 ### Version Control
 
 If you use Git (recommended), commit changes with descriptive messages. This gives you a changelog of how your Brain — and by extension, your professional identity and thinking — evolves over time. It also provides a safety net: if you prune too aggressively, you can recover.
+
+---
+
+## Operational Patterns
+
+As a Brain grows — from a personal system with 15 files to an enterprise knowledge base with hundreds — it needs formal processes for how information enters, how changes are tracked, and how consistency is maintained. These four patterns address that. They work at any scale but become essential as the Brain expands.
+
+### Ingest: How New Information Enters
+
+Without a formal ingest process, new information enters the Brain ad-hoc — someone edits a file, adds a paragraph, and moves on. This works at small scale but breaks down quickly: updates are inconsistent, related files get missed, and there's no record of what changed or why.
+
+A formal ingest workflow:
+
+1. **Analyse** — Read the source material and identify which Brain files it touches.
+2. **Plan** — List the specific changes: which files to update, what to add or revise, whether any new files are needed.
+3. **Review** — Present the plan to the human owner before making changes. The Brain is human-owned; the AI proposes, the human approves.
+4. **Execute** — Make the changes across all affected files.
+5. **Log** — Record the ingest (see below).
+
+Sources can be anything: articles, meeting notes, CV updates, role changes, project milestones, customer feedback. At enterprise scale, sources might include Slack threads, meeting transcripts, or customer call summaries — the workflow stays the same.
+
+**Key principle: one source can touch many files.** A role change might update identity, active roles, projects, NOW.md, and the loader. The ingest process should surface all touchpoints, not just the obvious one.
+
+### Log: Tracking What Changed and When
+
+Git provides version history, but it's not LLM-friendly — commit messages are terse, diffs are structural, and the timeline is hard to query conversationally. A Brain change log fills this gap.
+
+`LOG.md` is an append-only file recording ingests, updates, lint passes, and structural changes:
+
+```markdown
+## [2026-04-04] INGEST | Updated active roles from board meeting notes
+Files: 04_active_roles.md, NOW.md, 11_next_chapter_framework.md
+
+## [2026-04-01] LINT | Quarterly health check
+Files: (all files scanned)
+```
+
+The format is parseable (`grep "^## \[" LOG.md | tail -5` gives recent entries), human-readable, and gives the LLM timeline context for what changed and when. Operation types: INGEST, UPDATE, LINT, CREATE, SPLIT, PRUNE.
+
+### Lint: Periodic Health Checks
+
+Brains decay. Facts go stale, files bloat past limits, new content contradicts old claims, and files drift out of sync. A periodic lint check catches these problems before they mislead the AI.
+
+**Structural checks** (automated):
+- **Bloat** — Files exceeding the 200-line limit.
+- **Staleness** — Files past their review cadence (e.g., NOW.md untouched for >7 days).
+- **Orphans** — Files not referenced in the loader's navigation table.
+- **Drift** — Priorities in NOW.md that don't map to any active project or role.
+- **Large domain packs** — Subdirectories growing unwieldy (>15 files).
+
+**Semantic checks** (LLM-assisted):
+- Contradictions between files (e.g., a role listed as active in one file but absent from another).
+- Claims superseded by newer information.
+- Important concepts mentioned but never elaborated.
+- Missing cross-references between related files.
+
+**Cadence:** Monthly at minimum. Also run after any ingest operation and before accuracy-sensitive work (writing, applications, fact-dependent tasks). Integrate lint triggers into your loader's instructions so the LLM runs it proactively.
+
+### Index: Navigating at Scale
+
+At 15 files, a simple task-to-file navigation table suffices. At 100+ files across multiple domain packs, the LLM needs richer metadata to make smart loading decisions without reading everything.
+
+An effective index includes:
+- **Task routing** — Which files to load for which task types (the navigation table).
+- **Content summaries** — One-line descriptions of what each file contains.
+- **Operational files** — References to LOG.md and any other infrastructure files.
+
+The index lives in the loader file (not a separate file) and should be updated whenever files are added, removed, or significantly restructured. The LLM reads the index on every session start and uses it to determine what to load.
 
 ---
 

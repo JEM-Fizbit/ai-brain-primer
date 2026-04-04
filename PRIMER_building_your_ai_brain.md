@@ -295,6 +295,8 @@ A formal ingest workflow:
 
 Sources can be anything: articles, meeting notes, CV updates, role changes, project milestones, customer feedback. At enterprise scale, sources might include Slack threads, meeting transcripts, or customer call summaries — the workflow stays the same.
 
+**Source persistence:** Always save the original source to a `sources/` directory, organised by category (bios, cv, articles, meeting_notes, correspondence, etc.). Maintain a `SOURCES.md` index linking each source file to the Brain files it informed. This provides provenance — if a Brain fact is questioned, you can trace it back to the source document that produced it.
+
 **Key principle: one source can touch many files.** A role change might update identity, active roles, projects, NOW.md, and the loader. The ingest process should surface all touchpoints, not just the obvious one.
 
 ### Log: Tracking What Changed and When

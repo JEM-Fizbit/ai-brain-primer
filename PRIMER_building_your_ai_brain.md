@@ -216,6 +216,9 @@ Your career history changes rarely. Your current priorities change weekly. Don't
 ### 8. Make It Portable
 Write for any AI tool, not just your current one. Avoid tool-specific syntax or instructions. Plain Markdown with clear headers and consistent formatting works everywhere.
 
+### 9. Use Backlinks for Navigation
+Cross-reference files using `[[wikilinks]]` (Obsidian-compatible). Link on first significant mention per section. This creates a navigable knowledge graph that works in Obsidian (graph view, backlinks panel) and helps LLMs follow connections between files. During ingest, add backlinks between all affected files. During lint, flag content files with zero inbound links as orphans.
+
 ---
 
 ## Recommended File Structure
@@ -237,6 +240,10 @@ AI Brain/
 ├── JOURNAL.md                # Daily capture — decisions, actions, reflections
 ├── TASKS.md                  # Live task queue — operational to-dos
 ├── LOG.md                    # Append-only change log (ingests, updates, lints)
+├── quanta.md                 # Entity hub — consolidates cross-cutting context
+├── ref_career_chronology.md  # Split reference: career timeline, dates
+├── ref_publications_media.md # Split reference: awards, publications, patents
+├── ref_capital_deals.md      # Split reference: board roles, capital raised
 └── [domain_context]/         # Separate packs for specific domains
     ├── company_brain/
     └── project_brain/
@@ -299,6 +306,8 @@ Sources can be anything: articles, meeting notes, CV updates, role changes, proj
 
 **Key principle: one source can touch many files.** A role change might update identity, active roles, projects, NOW.md, and the loader. The ingest process should surface all touchpoints, not just the obvious one.
 
+**Cross-referencing:** When an ingest touches multiple files, add `[[backlinks]]` (Obsidian-style wikilinks) between them. Link format: `[[filename_without_extension]]`. This maintains a navigable knowledge graph. Over time, the link structure becomes as valuable as the content itself — it enables graph-based navigation in tools like Obsidian and helps LLMs discover related context by following links.
+
 ### Log: Tracking What Changed and When
 
 Git provides version history, but it's not LLM-friendly — commit messages are terse, diffs are structural, and the timeline is hard to query conversationally. A Brain change log fills this gap.
@@ -322,7 +331,7 @@ Brains decay. Facts go stale, files bloat past limits, new content contradicts o
 **Structural checks** (automated):
 - **Bloat** — Files exceeding the 200-line limit.
 - **Staleness** — Files past their review cadence (e.g., NOW.md untouched for >7 days).
-- **Orphans** — Files not referenced in the loader's navigation table.
+- **Orphans** — Content files with zero inbound `[[backlinks]]` from other files. Operational files (NOW, LOG, JOURNAL, TASKS, SOURCES) and the loader are exempt.
 - **Drift** — Priorities in NOW.md that don't map to any active project or role.
 - **Large domain packs** — Subdirectories growing unwieldy (>15 files).
 
@@ -333,6 +342,14 @@ Brains decay. Facts go stale, files bloat past limits, new content contradicts o
 - Missing cross-references between related files.
 
 **Cadence:** Monthly at minimum. Also run after any ingest operation and before accuracy-sensitive work (writing, applications, fact-dependent tasks). Integrate lint triggers into your loader's instructions so the LLM runs it proactively.
+
+### Entity Pages: Navigational Hubs
+
+As a Brain grows, key entities (companies, organisations, major projects) get mentioned across many files. When an entity appears in 3+ files with scattered context, create a dedicated entity page — a lightweight summary (~30-40 lines) that consolidates key facts and links out to the detailed category files. Entity pages are hubs, not duplicates: they state facts and link to where the full story lives. Example: `quanta.md` linking to identity (career arc), expertise (domain depth), and reference files (investment details).
+
+### Splitting Large Reference Files
+
+When a reference file exceeds the 200-line limit, split it by natural category boundaries. Each split file gets the original provenance header, links to sibling splits via backlinks, and a note documenting the split. Example: a 237-line extracted facts file splitting into career chronology, publications/media, and capital/deals — each under 90 lines.
 
 ### Index: Navigating at Scale
 

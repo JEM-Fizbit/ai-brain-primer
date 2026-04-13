@@ -117,16 +117,6 @@ A good loader includes:
 - A complete file listing.
 - Maintenance metadata (created date, last reviewed, review cadence).
 
-### Journal — The Daily Capture File
-**Cadence:** Daily entries, pruned weekly.
-
-A flat file (`JOURNAL.md`) for capturing decisions, actions, and reflections as they happen. Think of it as a staging area — entries live here temporarily until they're either ingested into the relevant Brain file during a weekly review, or pruned as ephemeral. Not an archive; not a diary. If the file exceeds 200 lines, that's a signal you're not pruning aggressively enough (or it's time to switch to weekly files in a `journal/` folder).
-
-### Task Queue — Operational To-Dos
-**Cadence:** Updated as tasks arise; reviewed weekly alongside NOW.md.
-
-`TASKS.md` tracks specific, actionable to-dos — distinct from the strategic priorities in `NOW.md`. NOW.md answers "what am I focused on?"; TASKS.md answers "what specifically needs doing?". Simple checkbox format. Future integration point for external task systems (Asana, Linear, etc.) via MCP or other automation.
-
 ### Context-Specific Packs
 For domains that need deep, specialised context (e.g., a specific company you work for, a complex project, a brand voice), maintain separate sub-directories. These get loaded only when relevant and prevent the core Brain from bloating.
 
@@ -216,9 +206,6 @@ Your career history changes rarely. Your current priorities change weekly. Don't
 ### 8. Make It Portable
 Write for any AI tool, not just your current one. Avoid tool-specific syntax or instructions. Plain Markdown with clear headers and consistent formatting works everywhere.
 
-### 9. Use Backlinks for Navigation
-Cross-reference files using `[[wikilinks]]` (Obsidian-compatible). Link on first significant mention per section. This creates a navigable knowledge graph that works in Obsidian (graph view, backlinks panel) and helps LLMs follow connections between files. During ingest, add backlinks between all affected files. During lint, flag content files with zero inbound links as orphans.
-
 ---
 
 ## Recommended File Structure
@@ -237,13 +224,6 @@ AI Brain/
 ├── 09_tools_stack.md         # Tech stack, tools, workflows
 ├── 10_mental_models.md       # Decision frameworks, worldview, beliefs
 ├── NOW.md                    # Current focus, priorities, open decisions
-├── JOURNAL.md                # Daily capture — decisions, actions, reflections
-├── TASKS.md                  # Live task queue — operational to-dos
-├── LOG.md                    # Append-only change log (ingests, updates, lints)
-├── quanta.md                 # Entity hub — consolidates cross-cutting context
-├── ref_career_chronology.md  # Split reference: career timeline, dates
-├── ref_publications_media.md # Split reference: awards, publications, patents
-├── ref_capital_deals.md      # Split reference: board roles, capital raised
 └── [domain_context]/         # Separate packs for specific domains
     ├── company_brain/
     └── project_brain/
@@ -281,86 +261,6 @@ Update the relevant files and prune what's no longer true.
 ### Version Control
 
 If you use Git (recommended), commit changes with descriptive messages. This gives you a changelog of how your Brain — and by extension, your professional identity and thinking — evolves over time. It also provides a safety net: if you prune too aggressively, you can recover.
-
----
-
-## Operational Patterns
-
-As a Brain grows — from a personal system with 15 files to an enterprise knowledge base with hundreds — it needs formal processes for how information enters, how changes are tracked, and how consistency is maintained. These four patterns address that. They work at any scale but become essential as the Brain expands.
-
-### Ingest: How New Information Enters
-
-Without a formal ingest process, new information enters the Brain ad-hoc — someone edits a file, adds a paragraph, and moves on. This works at small scale but breaks down quickly: updates are inconsistent, related files get missed, and there's no record of what changed or why.
-
-A formal ingest workflow:
-
-1. **Analyse** — Read the source material and identify which Brain files it touches.
-2. **Plan** — List the specific changes: which files to update, what to add or revise, whether any new files are needed.
-3. **Review** — Present the plan to the human owner before making changes. The Brain is human-owned; the AI proposes, the human approves.
-4. **Execute** — Make the changes across all affected files.
-5. **Log** — Record the ingest (see below).
-
-Sources can be anything: articles, meeting notes, CV updates, role changes, project milestones, customer feedback. At enterprise scale, sources might include Slack threads, meeting transcripts, or customer call summaries — the workflow stays the same.
-
-**Source persistence:** Always save the original source to a `sources/` directory, organised by category (bios, cv, articles, meeting_notes, correspondence, etc.). Maintain a `SOURCES.md` index linking each source file to the Brain files it informed. This provides provenance — if a Brain fact is questioned, you can trace it back to the source document that produced it.
-
-**Key principle: one source can touch many files.** A role change might update identity, active roles, projects, NOW.md, and the loader. The ingest process should surface all touchpoints, not just the obvious one.
-
-**Cross-referencing:** When an ingest touches multiple files, add `[[backlinks]]` (Obsidian-style wikilinks) between them. Link format: `[[filename_without_extension]]`. This maintains a navigable knowledge graph. Over time, the link structure becomes as valuable as the content itself — it enables graph-based navigation in tools like Obsidian and helps LLMs discover related context by following links.
-
-### Log: Tracking What Changed and When
-
-Git provides version history, but it's not LLM-friendly — commit messages are terse, diffs are structural, and the timeline is hard to query conversationally. A Brain change log fills this gap.
-
-`LOG.md` is an append-only file recording ingests, updates, lint passes, and structural changes:
-
-```markdown
-## [2026-04-04] INGEST | Updated active roles from board meeting notes
-Files: 04_active_roles.md, NOW.md, 11_next_chapter_framework.md
-
-## [2026-04-01] LINT | Quarterly health check
-Files: (all files scanned)
-```
-
-The format is parseable (`grep "^## \[" LOG.md | tail -5` gives recent entries), human-readable, and gives the LLM timeline context for what changed and when. Operation types: INGEST, UPDATE, LINT, CREATE, SPLIT, PRUNE.
-
-### Lint: Periodic Health Checks
-
-Brains decay. Facts go stale, files bloat past limits, new content contradicts old claims, and files drift out of sync. A periodic lint check catches these problems before they mislead the AI.
-
-**Structural checks** (automated):
-- **Bloat** — Files exceeding the 200-line limit.
-- **Staleness** — Files past their review cadence (e.g., NOW.md untouched for >7 days).
-- **Orphans** — Content files with zero inbound `[[backlinks]]` from other files. Operational files (NOW, LOG, JOURNAL, TASKS, SOURCES) and the loader are exempt.
-- **Drift** — Priorities in NOW.md that don't map to any active project or role.
-- **Large domain packs** — Subdirectories growing unwieldy (>15 files).
-
-**Semantic checks** (LLM-assisted):
-- Contradictions between files (e.g., a role listed as active in one file but absent from another).
-- Claims superseded by newer information.
-- Important concepts mentioned but never elaborated.
-- Missing cross-references between related files.
-
-**Cadence:** Monthly at minimum. Also run after any ingest operation and before accuracy-sensitive work (writing, applications, fact-dependent tasks). Integrate lint triggers into your loader's instructions so the LLM runs it proactively.
-
-### Entity Pages: Navigational Hubs
-
-As a Brain grows, key entities (companies, organisations, major projects) get mentioned across many files. When an entity appears in 3+ files with scattered context, create a dedicated entity page — a lightweight summary (~30-40 lines) that consolidates key facts and links out to the detailed category files. Entity pages are hubs, not duplicates: they state facts and link to where the full story lives. Example: `quanta.md` linking to identity (career arc), expertise (domain depth), and reference files (investment details).
-
-### Splitting Large Reference Files
-
-When a reference file exceeds the 200-line limit, split it by natural category boundaries. Each split file gets the original provenance header, links to sibling splits via backlinks, and a note documenting the split. Example: a 237-line extracted facts file splitting into career chronology, publications/media, and capital/deals — each under 90 lines.
-
-### Index: Navigating at Scale
-
-At 15 files, a simple task-to-file navigation table suffices. At 100+ files across multiple domain packs, the LLM needs richer metadata to make smart loading decisions without reading everything.
-
-An effective index includes:
-- **Task routing** — Which files to load for which task types (the navigation table).
-- **Content summaries** — One-line descriptions of what each file contains.
-- **Operational files** — References to LOG.md and any other infrastructure files.
-
-The index lives in the loader file (not a separate file) and should be updated whenever files are added, removed, or significantly restructured. The LLM reads the index on every session start and uses it to determine what to load.
 
 ---
 
@@ -479,6 +379,52 @@ Please:
 4. Execute the migration, creating the new file structure.
 5. Interview me to fill any gaps the migration reveals.
 ```
+
+---
+
+## Client Workflow: Which Tool for Which Task
+
+If you serve your Brain via MCP, you can access it from multiple Claude clients — Chat (claude.ai or Claude Desktop), Cowork, and Claude Code. Each client has different strengths, and matching the right client to the right task prevents friction.
+
+### Day-to-day Brain usage → Chat (any client with MCP)
+
+This is the primary interface and the whole point of the MCP architecture. Every read/write Brain tool works over stdio from any connected client. Use Chat for:
+
+- Loading Brain context for conversations (writing, career, strategy, advice)
+- Updating dynamic files (NOW.md, TASKS.md, JOURNAL.md)
+- Running `brain_search` and `brain_lint`
+- Small ingestions (under 500 words, passed directly via `source_content`)
+- Committing and pushing changes via `brain_commit`
+
+No manual file uploads, no copy-paste — the MCP server handles everything from within the conversation.
+
+### Heavy document ingestion → Cowork or Claude Code
+
+Large ingestions (CVs, articles, PDFs, writing samples) require a multi-step agentic workflow: saving files to the `sources/` directory, converting to Markdown, running `brain_ingest` with `dry_run=true`, updating multiple Brain files, then calling `brain_ingest_complete`. This needs direct filesystem access beyond what the MCP server exposes (it only writes to `brain/`, not `sources/`).
+
+Both Cowork and Claude Code work here. Cowork is often more natural for document-driven work since you can drag-and-drop files into the conversation and the agent handles the rest. When completing ingestion, pass the `inbox_file` parameter to `brain_ingest_complete` so the original inbox file is automatically deleted after provenance is recorded.
+
+**Note:** Claude Desktop Chat runs in a container with no host filesystem access. If you attempt large ingestion from Chat, the system will inform you to switch to Cowork or Claude Code.
+
+### MCP server code maintenance → Claude Code
+
+The MCP server itself is a TypeScript codebase — editing source files, running builds, testing, linting, and managing git. Claude Code is purpose-built for this kind of iterative software engineering workflow. Cowork can do it, but Code is more ergonomic for build-test cycles.
+
+### Brain content repo maintenance → Claude Code
+
+Git operations on the Brain repo (resolving merge conflicts, rebasing, pushing, managing branches) are best handled in Claude Code where you have direct shell access and git tooling.
+
+### Summary
+
+| Activity | Best client | Why |
+|---|---|---|
+| Using Brain in conversation | Chat (any client with MCP) | That's what the MCP server is for |
+| Small updates (NOW, TASKS, etc.) | Chat | MCP tools handle it directly |
+| Large document ingestion | Cowork or Code | Needs filesystem access to `sources/` |
+| MCP server code changes | Code | Software engineering workflow |
+| Brain repo git maintenance | Code | Shell access, git tooling |
+
+The general principle: **use Chat for consuming and lightly editing Brain content, use Cowork or Code for operations that need filesystem access or agentic multi-step workflows, and use Code specifically for anything that involves software engineering.**
 
 ---
 

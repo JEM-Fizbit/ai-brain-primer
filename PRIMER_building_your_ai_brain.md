@@ -406,6 +406,42 @@ Both Cowork and Claude Code work here. Cowork is often more natural for document
 
 **Note:** Claude Desktop Chat runs in a container with no host filesystem access. If you attempt large ingestion from Chat, the system will inform you to switch to Cowork or Claude Code.
 
+### Inbox drop-folder
+
+An `inbox/` directory at the Brain repo root serves as a drop-folder for pending sources. Users can drop files there at any time (via Finder, scripts, or automation). The MCP server's `brain_scan_inbox` tool lists pending files, and `brain_load_context` nudges when items are waiting. After ingestion, the `inbox_file` parameter on `brain_ingest_complete` automatically deletes the processed file from the inbox.
+
+This is an alternative to attaching files directly in conversation — useful for batch processing or when files arrive between sessions.
+
+### URL/webpage ingestion
+
+Web content can be ingested as Brain sources without saving an original file. The workflow: fetch the page content (via WebFetch or equivalent), save the markdown to `sources/{category}/{YYYY-MM-DD}_{slug}.md`, update Brain files, then call `brain_ingest_complete` with the markdown path and URL noted in the source label.
+
+### Recommended source categories
+
+Organise source files into typed subfolders within `sources/`. A recommended taxonomy:
+
+| Category | Purpose | Examples |
+|---|---|---|
+| `bios` | Published bios, speaker packs | LinkedIn about, conference bio |
+| `cv` | Formal CVs/resumes only | The PDF you'd send to a recruiter |
+| `career_history` | Supporting career evidence | Track records, deal sheets, directorships, publications |
+| `assessments` | Psychometric & leadership data | Hogan, 360s, coaching notes |
+| `writing_samples` | Published or draft writing | Articles, essays, blog posts |
+| `meeting_notes` | Notes from meetings, calls, boards | Board minutes, advisory call notes |
+| `correspondence` | Important emails, letters | Offer letters, key exchanges |
+| `personal` | Identity docs, insurance, medical | **Gitignore this folder** — never commit sensitive docs |
+| `research` | External articles, reports | Industry news, saved webpages |
+| `travel` | Trip plans, bookings | Itineraries, travel docs |
+| `favourites` | Personal preferences | Restaurants, hotels, venues |
+| `photos` | Headshots, event photos | Speaker photos, press kit images |
+| `other` | Genuine catch-all | Anything that doesn't fit above |
+
+Adapt this to your situation — not every category will be needed immediately. The key principle is that `cv` stays narrow (formal CVs only) and everything else has a clear home.
+
+### Surgical edits with patch mode
+
+The MCP server's `brain_update_file` tool supports three modes: `replace` (full overwrite), `append` (add to end), and `patch` (find-and-replace within a file using `old_content` and `content` parameters). Prefer `patch` for section-level edits — it avoids the risk of accidentally overwriting an entire file when you only need to change a paragraph.
+
 ### MCP server code maintenance → Claude Code
 
 The MCP server itself is a TypeScript codebase — editing source files, running builds, testing, linting, and managing git. Claude Code is purpose-built for this kind of iterative software engineering workflow. Cowork can do it, but Code is more ergonomic for build-test cycles.

@@ -206,6 +206,21 @@ Your career history changes rarely. Your current priorities change weekly. Don't
 ### 8. Make It Portable
 Write for any AI tool, not just your current one. Avoid tool-specific syntax or instructions. Plain Markdown with clear headers and consistent formatting works everywhere.
 
+### 9. Capture Outputs, Not Just Inputs
+Most Brain implementations focus on ingesting *inputs* — CVs, bios, writing samples, documents. This misses half the value. The *outputs* you produce with an AI — decision memos, opportunity evaluations, strategy analyses, board prep, draft essays — also represent durable reasoning that should compound across sessions.
+
+Without an output-capture habit, a 1,200-word analysis of "Should I accept this board seat?" lives only in a session transcript. Three months later, when the same decision framework would be useful for a different opportunity, the reasoning is gone.
+
+**The protocol:**
+- **Threshold:** Original reasoning of roughly ≥500 words, OR any written artifact the user would plausibly re-read (memos, decision frameworks, drafts). Skip routine answers and information retrieval.
+- **Location:** A dedicated `sources/analysis/` directory for non-publication reasoning. Reserve `sources/writing_samples/` for publication-bound work.
+- **Format pattern — mirrors input ingestion:** If the deliverable *is* the markdown (analysis, memo, written argument), save markdown-only. If the deliverable is a binary (.pptx, .docx, .pdf, .xlsx), save the binary alongside a markdown companion that captures the argument structure, decisions, and rationale — typically 300–800 words. The companion is a summary of *thinking*, not a mechanical conversion. The binary is provenance; the markdown is what future sessions query.
+- **Linking:** Backlink each analysis from the relevant entity or topic file under a "Related Analyses" section.
+- **Journal entry:** One-line note in `JOURNAL.md` capturing the analysis and its headline conclusion — searchable, scannable.
+- **Prompt shape:** The AI should ask at a natural pause once thinking has stabilised, not mid-draft.
+
+Inspired by Karpathy's observation that his knowledge base compounds when "outputs get filed back into the wiki to enhance it for further queries." The same principle applies to a professional context pack: reasoning produced in one session should be retrievable in the next.
+
 ---
 
 ## Recommended File Structure
@@ -400,7 +415,7 @@ No manual file uploads, no copy-paste — the MCP server handles everything from
 
 ### Heavy document ingestion → Cowork or Claude Code
 
-Large ingestions (CVs, articles, PDFs, writing samples) require a multi-step agentic workflow: saving files to the `sources/` directory, converting to Markdown, running `brain_ingest` with `dry_run=true`, updating multiple Brain files, then calling `brain_ingest_complete`. This needs direct filesystem access beyond what the MCP server exposes (it only writes to `brain/`, not `sources/`).
+Large ingestions (CVs, articles, PDFs, writing samples) require a multi-step agentic workflow: saving files to the `sources/` directory, converting to Markdown, running `brain_ingest` with `dry_run=true`, updating multiple Brain files, then calling `brain_ingest_complete`. This needs direct filesystem access beyond what the MCP server exposes for writes (the server writes to `brain/` via `brain_update_file` and to `sources/` only via the ingest pipeline).
 
 Both Cowork and Claude Code work here. Cowork is often more natural for document-driven work since you can drag-and-drop files into the conversation and the agent handles the rest. When completing ingestion, pass the `inbox_file` parameter to `brain_ingest_complete` so the original inbox file is automatically deleted after provenance is recorded.
 
@@ -427,6 +442,7 @@ Organise source files into typed subfolders within `sources/`. A recommended tax
 | `career_history` | Supporting career evidence | Track records, deal sheets, directorships, publications |
 | `assessments` | Psychometric & leadership data | Hogan, 360s, coaching notes |
 | `writing_samples` | Published or draft writing | Articles, essays, blog posts |
+| `analysis` | Original strategic thinking produced in-session | Decision memos, opportunity evaluations, competitive analyses, board/pitch prep |
 | `meeting_notes` | Notes from meetings, calls, boards | Board minutes, advisory call notes |
 | `correspondence` | Important emails, letters | Offer letters, key exchanges |
 | `personal` | Identity docs, insurance, medical | **Gitignore this folder** — never commit sensitive docs |
@@ -437,6 +453,12 @@ Organise source files into typed subfolders within `sources/`. A recommended tax
 | `other` | Genuine catch-all | Anything that doesn't fit above |
 
 Adapt this to your situation — not every category will be needed immediately. The key principle is that `cv` stays narrow (formal CVs only) and everything else has a clear home.
+
+### Vault vs. archive: read scope
+
+The Brain has two read surfaces: the curated `brain/` vault (summarised, linked, kept lean) and the `sources/` archive (full original documents — bio variants, CVs, meeting notes, research). Both are Markdown. The vault is what Claude loads by default; the archive is available on demand.
+
+`brain_read_file` and `brain_search` take a `scope` parameter (`brain` | `sources` | `all` — search only) so Claude can reach into the archive when the vault contains a pointer rather than the full text. `brain_list_sources` enumerates the archive by category. This separation keeps the vault lean (no 2,000-line bios stuffed into identity files) without sacrificing access — when the full source is needed, Claude can fetch it directly.
 
 ### Surgical edits with patch mode
 
